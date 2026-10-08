@@ -22,6 +22,33 @@ const ctx = {
   whitelist: new WhitelistManager(config)
 }
 
+async function logCommand(interaction) {
+  if (!config.logs) return
+
+  try {
+    const channel = await client.channels.fetch(config.logs)
+    if (!channel?.isTextBased()) {
+      log.warn('Command log channel is not text based')
+      return
+    }
+
+    const group = interaction.options?._group
+    const subcommand = interaction.options?._subcommand
+    const command = [
+      `/${interaction.commandName}`,
+      group,
+      subcommand
+    ].filter(Boolean).join(' ')
+
+    await channel.send({
+      components: [panels.commandLog(interaction.user.tag, interaction.user.id, command)],
+      flags: MessageFlags.IsComponentsV2
+    })
+  } catch (error) {
+    log.warn('Could not write command log', error?.message ?? error)
+  }
+}
+
 async function handleButton(interaction) {
   const [scope, action, ownerId] = interaction.customId.split(':')
   if (scope !== 'realm' || action !== 'leave') return
@@ -86,6 +113,7 @@ client.once(Events.ClientReady, async ready => {
 client.on(Events.InteractionCreate, async interaction => {
   try {
     if (interaction.isChatInputCommand()) {
+      await logCommand(interaction)
       await commands.get(interaction.commandName)?.execute(interaction, ctx)
     } else if (interaction.isButton()) {
       await handleButton(interaction)
