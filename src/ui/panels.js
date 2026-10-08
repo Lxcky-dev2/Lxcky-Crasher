@@ -73,6 +73,18 @@ const panels = {
     return panel({ color: COLORS.danger, title, description: message })
   },
 
+  commandLog(user, userId, command) {
+    return panel({
+      color: COLORS.neutral,
+      title: 'Command Log',
+      fields: [
+        { name: 'User:', value: bold(user) },
+        { name: 'User ID:', value: code(userId) },
+        { name: 'Command:', value: code(command) }
+      ]
+    })
+  },
+
   realmWhitelisted() {
     return panel({
       color: COLORS.warning,
