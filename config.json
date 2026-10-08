@@ -2,5 +2,10 @@
   "token": "",
   "clientId": "",
   "guildId": "",
-  "logs": ""
+  "logs": "",
+  "admins": [
+    "",
+    ""
+  ]
 }
+
